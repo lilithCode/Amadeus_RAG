@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-cyber-cyan: #00f3ff;
+  --color-cyber-magenta: #ff00ff;
+  --color-cyber-yellow: #fcee0a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-black text-white/90 overflow-hidden font-mono selection:bg-cyber-cyan selection:text-black;
+    cursor: none !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+
+  .cyber-glass {
+    @apply bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+
+  .clip-chamfer {
+    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px),
+        calc(100% - 20px) 100%, 0 100%, 0 20px);
+  }
+
+ 
+  .clip-cyber {
+    clip-path: polygon(0 0, 92% 0, 100% 8%, 100% 100%, 8% 100%, 0 92%);
+  }
+
+ 
+  .clip-msg-bot {
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
+  }
+
+  .clip-msg-user {
+    clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 15%);
+  }
+
+  .neon-border-cyan {
+    border: 1px solid rgba(0, 243, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+  }
+
+  .neon-border-magenta {
+    border: 1px solid rgba(255, 0, 255, 0.4);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.1);
+  }
+
+  .animate-spin-slow {
+    animation: spin 12s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }

@@ -1,65 +1,167 @@
-import Image from "next/image";
+"use client";
+import { useState, useRef, useEffect } from "react";
+import CyberCursor from "@/components/CyberCursor";
+import LeftPanel from "@/components/LeftPanel";
+import ChatPanel from "@/components/ChatPanel";
+import RightPanel from "@/components/RightPanel";
+import AboutModal from "@/components/AboutModal";
 
 export default function Home() {
+  const [bootProgress, setBootProgress] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(0);
+  const [showAbout, setShowAbout] = useState(false);
+
+  const [messages, setMessages] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<number | null>(null);
+  const [input, setInput] = useState("");
+
+  useEffect(() => {
+    if (bootProgress < 100) {
+      const timer = setTimeout(() => setBootProgress((p) => p + 5), 30);
+      return () => clearTimeout(timer);
+    }
+  }, [bootProgress]);
+
+  const initializeSystem = () => {
+    setIsInitialized(true);
+    setIsPlaying(true);
+    playSfx("receive");
+  };
+
+  const playSfx = (type: string) => {
+    const audio = new Audio(`/sfx/${type}.mp3`);
+    audio.volume = 0.2;
+    audio.play().catch(() => {});
+  };
+
+
+  // CHAT & HISTORY LOGIC 
+  const handleSend = () => {
+    if (!input.trim()) return;
+
+    playSfx("send");
+    const userMsg = { role: "user", content: input };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput("");
+
+    let sessionId = activeSessionId;
+    if (!sessionId) {
+      sessionId = Date.now();
+      setActiveSessionId(sessionId);
+      const newHistoryItem = {
+        id: sessionId,
+        name: input.slice(0, 20) + (input.length > 20 ? "..." : ""),
+        data: newMessages,
+      };
+      setHistory((prev) => [newHistoryItem, ...prev]);
+    } else {
+      setHistory((prev) =>
+        prev.map((h) =>
+          h.id === sessionId ? { ...h, data: [...h.data, userMsg] } : h,
+        ),
+      );
+    }
+
+    setTimeout(() => {
+      playSfx("receive");
+      const botMsg = {
+        role: "assistant",
+        content: `[LOG]: Signal synchronized. Processing request: "${input.slice(0, 10)}..."`,
+      };
+      setMessages((prev) => [...prev, botMsg]);
+
+      // Update history 
+      setHistory((prev) =>
+        prev.map((h) =>
+          h.id === sessionId ? { ...h, data: [...h.data, botMsg] } : h,
+        ),
+      );
+    }, 1000);
+  };
+
+  const startNewChat = () => {
+    setMessages([]);
+    setActiveSessionId(null);
+    playSfx("send");
+  };
+
+  const loadSession = (session: any) => {
+    setMessages(session.data);
+    setActiveSessionId(session.id);
+    playSfx("receive");
+  };
+
+  if (!isInitialized) {
+    return (
+      <div className="h-screen w-screen bg-black flex flex-col items-center justify-center font-mono">
+        <div className="w-80 h-1 bg-zinc-900 border border-white/10 mb-6 overflow-hidden">
+          <div
+            className="h-full bg-cyber-cyan shadow-[0_0_15px_#00f3ff]"
+            style={{ width: `${bootProgress}%` }}
+          />
+        </div>
+        {bootProgress >= 100 ? (
+          <button
+            onClick={initializeSystem}
+            className="px-8 py-3 border-2 border-cyber-cyan text-cyber-cyan animate-pulse hover:bg-cyber-cyan hover:text-black transition-all font-black"
+          >
+            INITIALIZE_NEURAL_LINK
+          </button>
+        ) : (
+          <div className="text-cyber-cyan text-xs tracking-[0.5em] animate-pulse">
+            AMADEUS_BOOTING... {bootProgress}%
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="relative h-screen w-screen p-4 flex gap-4 bg-[#050508] overflow-hidden">
+      <CyberCursor />
+
+      <div
+        className="absolute inset-0 z-0 bg-cover bg-center opacity-40"
+        style={{
+          backgroundImage: "url('/background.png')",
+          filter: "brightness(0.5)",
+        }}
+      />
+
+      <LeftPanel
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+        currentTrack={currentTrack}
+        setCurrentTrack={setCurrentTrack}
+        playSfx={playSfx}
+      />
+
+      <ChatPanel
+        messages={messages}
+        input={input}
+        setInput={setInput}
+        handleSend={handleSend}
+        startNewChat={startNewChat}
+        playSfx={playSfx}
+      />
+
+      <RightPanel
+        isPlaying={isPlaying}
+        history={history}
+        loadSession={loadSession}
+        openAbout={() => setShowAbout(true)}
+        playSfx={playSfx}
+      />
+
+      <AboutModal
+        isOpen={showAbout}
+        onClose={() => setShowAbout(false)}
+        playSfx={playSfx}
+      />
+    </main>
   );
 }
