@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import CyberCursor from "@/components/CyberCursor";
 import LeftPanel from "@/components/LeftPanel";
 import ChatPanel from "@/components/ChatPanel";
@@ -12,6 +12,7 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
   const [showAbout, setShowAbout] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [messages, setMessages] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
@@ -36,26 +37,27 @@ export default function Home() {
     audio.volume = 0.2;
     audio.play().catch(() => {});
   };
+  // CHAT & HISTORY LOGIC
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
-
-  // CHAT & HISTORY LOGIC 
-  const handleSend = () => {
-    if (!input.trim()) return;
-
+    const userText = input;
     playSfx("send");
-    const userMsg = { role: "user", content: input };
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
+    setIsLoading(true);
+
+    const userMsg = { role: "user", content: userText };
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
 
+    // Manage History Session
     let sessionId = activeSessionId;
     if (!sessionId) {
       sessionId = Date.now();
       setActiveSessionId(sessionId);
       const newHistoryItem = {
         id: sessionId,
-        name: input.slice(0, 20) + (input.length > 20 ? "..." : ""),
-        data: newMessages,
+        name: userText.slice(0, 20) + (userText.length > 20 ? "..." : ""),
+        data: [userMsg],
       };
       setHistory((prev) => [newHistoryItem, ...prev]);
     } else {
@@ -66,21 +68,41 @@ export default function Home() {
       );
     }
 
-    setTimeout(() => {
-      playSfx("receive");
-      const botMsg = {
-        role: "assistant",
-        content: `[LOG]: Signal synchronized. Processing request: "${input.slice(0, 10)}..."`,
-      };
-      setMessages((prev) => [...prev, botMsg]);
+    try {
+      // FETCH FROM YOUR HUGGING FACE SPACE
+       const response = await fetch("https://lillilith-neuraai.hf.space/chat", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ input: userText }), // Sends the user text to Hamza
+       });
 
-      // Update history 
+       const data = await response.json();
+       const botReply = data.reply; // This is Hamza's response!
+
+       playSfx("receive");
+       setMessages((prev) => [
+         ...prev,
+         { role: "assistant", content: botReply },
+       ]);
+
+      // Update history session with bot reply
       setHistory((prev) =>
         prev.map((h) =>
-          h.id === sessionId ? { ...h, data: [...h.data, botMsg] } : h,
+          h.id === sessionId ? { ...h, data: [...h.data, botReply] } : h,
         ),
       );
-    }, 1000);
+    } catch (error) {
+      console.error("Connection Error:", error);
+      playSfx("receive");
+      const errorMsg = {
+        role: "assistant",
+        content:
+          "[SYSTEM_ERROR]: Neural link synchronization failed. Amadeus_Core is currently unreachable.",
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const startNewChat = () => {
@@ -147,6 +169,7 @@ export default function Home() {
         handleSend={handleSend}
         startNewChat={startNewChat}
         playSfx={playSfx}
+        isLoading={isLoading}
       />
 
       <RightPanel
