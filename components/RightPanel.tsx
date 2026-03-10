@@ -1,20 +1,13 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  History,
-  Info,
-  Code,
-  Activity,
-  Github,
-  Database,
-  Globe,
-} from "lucide-react";
+import { History, Info, Code, Activity, Github, Database } from "lucide-react";
 
 export default function RightPanel({
   playSfx,
   history,
   loadSession,
+  activeSessionId,
   openAbout,
   isPlaying,
 }: any) {
@@ -24,17 +17,12 @@ export default function RightPanel({
     {
       name: "GitHub Repo",
       icon: <Github size={14} />,
-      url: "YOUR_GITHUB_LINK",
-    },
-    {
-      name: "HF Space",
-      icon: <Globe size={14} />,
-      url: "https://huggingface.co/spaces/lillilith/AmadeusAi",
+      url: "https://github.com/lilithCode/Amadeus",
     },
     {
       name: "Kaggle Notebook",
       icon: <Database size={14} />,
-      url: "YOUR_KAGGLE_LINK",
+      url: "https://www.kaggle.com/code/hamnamubarak/amadeus",
     },
   ];
 
@@ -42,7 +30,7 @@ export default function RightPanel({
     <aside className="w-72 flex flex-col gap-4 z-10">
       <div className="cyber-glass neon-border-magenta p-5 clip-cyber">
         <div className="flex items-center gap-2 text-[9px] font-black text-cyber-magenta opacity-60 uppercase mb-4 italic tracking-widest">
-          <Activity size={12} /> signals
+          <Activity size={12} /> neural_sync
         </div>
         <div className="h-12 flex items-end gap-1 px-2">
           {[40, 80, 50, 95, 70, 85, 45, 60, 30, 50].map((h, i) => (
@@ -64,17 +52,25 @@ export default function RightPanel({
         <div className="flex items-center gap-2 text-[10px] font-black text-cyber-cyan uppercase mb-6 border-b border-white/10 pb-2 italic tracking-widest">
           <History size={14} /> session_logs
         </div>
-        <div className="space-y-2 overflow-y-auto scrollbar-hide">
-          {history.map((h: any, i: number) => (
+
+        <div className="space-y-2 overflow-y-auto pr-1 scrollbar-hide">
+          {history.length === 0 && (
+            <div className="text-[9px] text-white/20 italic p-4 text-center">
+              NO_LOGS_AVAILABLE
+            </div>
+          )}
+          {history.map((h: any) => (
             <button
-              key={i}
-              onClick={() => {
-                loadSession(h);
-                playSfx("receive");
-              }}
-              className="w-full text-left text-[10px] font-bold text-white/40 hover:text-cyber-cyan hover:bg-white/5 p-2 border-l border-white/10 transition-all italic truncate"
+              key={h.id}
+              onClick={() => loadSession(h)}
+              className={`w-full text-left text-[10px] font-bold p-3 border-l-2 transition-all italic flex flex-col gap-1 ${
+                activeSessionId === h.id
+                  ? "bg-cyber-cyan/10 border-cyber-cyan text-cyber-cyan"
+                  : "border-transparent text-white/40 hover:text-white hover:bg-white/5"
+              }`}
             >
-              {`> ${h.name}`}
+              <span className="truncate uppercase">{`> ${h.name}`}</span>
+              <span className="text-[8px] opacity-30 font-mono">{h.date}</span>
             </button>
           ))}
         </div>
@@ -85,7 +81,7 @@ export default function RightPanel({
           openAbout();
           playSfx("send");
         }}
-        className="cyber-glass border border-white/20 p-4 flex justify-between items-center group hover:bg-cyber-cyan/10 transition-all"
+        className="cyber-glass border border-white/20 p-4 flex justify-between items-center group hover:bg-cyber-cyan/10 transition-all clip-chamfer"
       >
         <span className="text-[10px] font-black uppercase text-white/60 group-hover:text-white">
           About_Amadeus
@@ -100,13 +96,14 @@ export default function RightPanel({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-full mb-2 w-full bg-[#0a0a0c] border border-cyber-yellow/30 p-2 space-y-1 shadow-2xl"
+              className="absolute bottom-full mb-2 w-full bg-[#0a0a0c] border border-cyber-yellow/30 p-2 space-y-1 shadow-2xl z-50"
             >
               {links.map((link) => (
                 <a
                   key={link.name}
                   href={link.url}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-3 p-2 text-[10px] text-white/60 hover:text-cyber-yellow hover:bg-white/5 transition-all uppercase font-bold"
                 >
                   {link.icon} {link.name}
@@ -121,7 +118,7 @@ export default function RightPanel({
             setShowLinks(!showLinks);
             playSfx("send");
           }}
-          className="w-full bg-cyber-yellow p-4 text-black font-black uppercase text-[10px] flex justify-between items-center px-6 hover:brightness-110 transition-all"
+          className="w-full bg-cyber-yellow p-4 text-black font-black uppercase text-[10px] flex justify-between items-center px-6 hover:brightness-110 transition-all clip-chamfer"
         >
           Source_Code <Code size={16} />
         </button>

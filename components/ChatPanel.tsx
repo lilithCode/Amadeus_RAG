@@ -11,7 +11,7 @@ export default function ChatPanel({
   isLoading,
 }: any) {
   return (
-    <section className="flex-1 flex flex-col cyber-panel neon-border-cyan z-20 overflow-hidden clip-chamfer">
+    <section className="flex-1 flex flex-col cyber-panel neon-border-cyan z-20 overflow-hidden clip-chamfer bg-black/20">
       <div className="p-4 border-b border-white/10 flex justify-between items-center bg-black/30 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 border border-cyber-cyan rounded-full p-0.5">
@@ -23,25 +23,46 @@ export default function ChatPanel({
               />
             </div>
           </div>
-          <span className="font-black italic text-sm tracking-tighter text-cyber-cyan">
-            AMADEUS_Senpai
-          </span>
+          <div className="flex flex-col">
+            <span className="font-black italic text-sm tracking-tighter text-cyber-cyan">
+              AMADEUS_SYSTEM
+            </span>
+            <span className="text-[8px] text-cyber-cyan/50 tracking-[0.2em]">
+              STATUS: ONLINE
+            </span>
+          </div>
         </div>
+
         <button
           onClick={startNewChat}
-          className="p-2 border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan/20 transition-all"
+          title="New Neural Link"
+          className="p-2 border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan hover:text-black transition-all group"
         >
-          <Plus size={20} />
+          <Plus
+            size={20}
+            className="group-hover:rotate-90 transition-transform"
+          />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-cyber">
+        {messages.length === 0 && !isLoading && (
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center space-y-2 opacity-20">
+              <Terminal className="mx-auto mb-4" size={40} />
+              <p className="text-[10px] uppercase tracking-[0.4em]">
+                Awaiting Input...
+              </p>
+            </div>
+          </div>
+        )}
+
         <AnimatePresence mode="popLayout">
           {messages.map((msg: any, i: number) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, x: msg.role === "user" ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
@@ -62,22 +83,18 @@ export default function ChatPanel({
               animate={{ opacity: 1, x: 0 }}
               className="flex justify-start"
             >
-              <div className="bg-cyber-cyan/10 text-cyber-cyan clip-msg-bot border-l-2 border-cyber-cyan px-6 py-4 flex flex-col gap-2">
-                
+              <div className="bg-cyber-cyan/10 text-cyber-cyan clip-msg-bot border-l-2 border-cyber-cyan px-6 py-4">
                 <div className="flex gap-1.5 items-center h-4">
                   {[0, 1, 2].map((dot) => (
                     <motion.div
                       key={dot}
-                      animate={{
-                        scale: [1, 1.4, 1],
-                        opacity: [0.3, 1, 0.3],
-                      }}
+                      animate={{ scale: [1, 1.4, 1], opacity: [0.3, 1, 0.3] }}
                       transition={{
                         repeat: Infinity,
                         duration: 0.8,
                         delay: dot * 0.2,
                       }}
-                      className="w-1.5 h-1.5 bg-cyber-cyan shadow-[0_0_5px_#00f3ff]"
+                      className="w-1.5 h-1.5 bg-cyber-cyan"
                     />
                   ))}
                 </div>

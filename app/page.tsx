@@ -16,10 +16,30 @@ export default function Home() {
   const [showAbout, setShowAbout] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  
   const [messages, setMessages] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
-  const [activeSessionId, setActiveSessionId] = useState<number | null>(null);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
+
+  
+  useEffect(() => {
+    const savedHistory = localStorage.getItem("amadeus_sessions");
+    if (savedHistory) {
+      try {
+        setHistory(JSON.parse(savedHistory));
+      } catch (e) {
+        console.error("Failed to load history", e);
+      }
+    }
+  }, []);
+
+  
+  useEffect(() => {
+    if (history.length > 0) {
+      localStorage.setItem("amadeus_sessions", JSON.stringify(history));
+    }
+  }, [history]);
 
   useEffect(() => {
     if (bootProgress < 100) {
@@ -40,27 +60,70 @@ export default function Home() {
     audio.play().catch(() => {});
   };
 
+  
+  const startNewChat = () => {
+    setMessages([]);
+    setActiveSessionId(null);
+    playSfx("send");
+  };
+
+  
+  const loadSession = (session: any) => {
+    setActiveSessionId(session.id);
+    setMessages(session.messages);
+    playSfx("receive");
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
+
     const userText = input;
     const userMsg = { role: "user", content: userText };
-    setMessages((prev) => [...prev, userMsg]);
+    const newMessages = [...messages, userMsg];
+
+    
+    setMessages(newMessages);
     setInput("");
     playSfx("send");
     setIsLoading(true);
 
     try {
-      const historyToSend = [...messages, userMsg];
-     const response = await fetch("/api/chat", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ messages: historyToSend }),
-     });
-      const data = await response.json();
-      playSfx("receive");
-      const assistantMsg = { role: "assistant", content: data.reply };
-      setMessages((prev) => [...prev, assistantMsg]);
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: newMessages }),
+      });
 
+      const data = await response.json();
+      const assistantMsg = {
+        role: "assistant",
+        content: data.reply || "SYSTEM_OFFLINE",
+      };
+      const updatedMessages = [...newMessages, assistantMsg];
+
+      setMessages(updatedMessages);
+      playSfx("receive");
+
+      
+      if (!activeSessionId) {
+        
+        const newId = Date.now().toString();
+        setActiveSessionId(newId);
+        const newSession = {
+          id: newId,
+          name: userText.substring(0, 25) + (userText.length > 25 ? "..." : ""),
+          messages: updatedMessages,
+          date: new Date().toLocaleTimeString(),
+        };
+        setHistory((prev) => [newSession, ...prev]);
+      } else {
+        
+        setHistory((prev) =>
+          prev.map((s) =>
+            s.id === activeSessionId ? { ...s, messages: updatedMessages } : s,
+          ),
+        );
+      }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -104,15 +167,14 @@ export default function Home() {
               input={input}
               setInput={setInput}
               handleSend={handleSend}
+              startNewChat={startNewChat}
               isLoading={isLoading}
             />
             <RightPanel
               isPlaying={isPlaying}
               history={history}
-              loadSession={(s: any) => {
-                setMessages(s.data);
-                setActiveSessionId(s.id);
-              }}
+              activeSessionId={activeSessionId}
+              loadSession={loadSession}
               openAbout={() => setShowAbout(true)}
               playSfx={playSfx}
             />
