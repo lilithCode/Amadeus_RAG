@@ -54,10 +54,8 @@ export default function LeftPanel({
               alt="cover"
               style={{ objectPosition: "center" }}
             />
-            {/* Vinyl Overlay */}
             <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_30%,rgba(0,0,0,0.3)_100%)] pointer-events-none" />
 
-            {/* Center Hole */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-12 h-12 bg-black border border-cyber-cyan  rounded-full flex items-center justify-center">
                 <div className="w-3 h-3 bg-cyber-cyan rounded-full shadow-[0_0_10px_#00f3ff]" />

@@ -56,7 +56,6 @@ export default function ChatPanel({
             </motion.div>
           ))}
 
-          {/* CYBERPUNK TYPING INDICATOR */}
           {isLoading && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -107,7 +106,7 @@ export default function ChatPanel({
           disabled={isLoading}
           className="bg-cyber-cyan text-black px-8 font-black uppercase text-[10px] clip-chamfer hover:bg-white transition-all flex items-center gap-2 disabled:bg-zinc-800 disabled:text-zinc-500"
         >
-          {isLoading ? "SYNCING" : "SEND"} <Send size={12} />
+          {isLoading ? "WAIT" : "SEND"} <Send size={12} />
         </button>
       </div>
     </section>
