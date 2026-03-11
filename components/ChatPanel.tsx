@@ -1,6 +1,7 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Terminal, Send } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 export default function ChatPanel({
   messages,
@@ -10,6 +11,14 @@ export default function ChatPanel({
   startNewChat,
   isLoading,
 }: any) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isLoading]);
+
   return (
     <section className="flex-1 flex flex-col cyber-panel neon-border-cyan z-20 overflow-hidden clip-chamfer bg-black/20">
       <div className="p-4 border-b border-white/10 flex justify-between items-center bg-black/30 backdrop-blur-md">
@@ -102,6 +111,8 @@ export default function ChatPanel({
             </motion.div>
           )}
         </AnimatePresence>
+
+        <div ref={scrollRef} />
       </div>
 
       <div className="p-6 bg-black/40 border-t border-white/10 flex gap-3">
