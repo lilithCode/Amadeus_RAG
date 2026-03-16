@@ -16,7 +16,9 @@ export default function Home() {
   const [showAbout, setShowAbout] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [activeMobilePanel, setActiveMobilePanel] = useState<"chat" | "left" | "right">("chat");
+  const [activeMobilePanel, setActiveMobilePanel] = useState<
+    "chat" | "left" | "right"
+  >("chat");
 
   const [messages, setMessages] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
@@ -28,12 +30,15 @@ export default function Home() {
     if (savedHistory) {
       try {
         setHistory(JSON.parse(savedHistory));
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, []);
 
   useEffect(() => {
-    if (history.length > 0) localStorage.setItem("amadeus_sessions", JSON.stringify(history));
+    if (history.length > 0)
+      localStorage.setItem("amadeus_sessions", JSON.stringify(history));
   }, [history]);
 
   useEffect(() => {
@@ -78,7 +83,10 @@ export default function Home() {
         body: JSON.stringify({ messages: [...messages, userMsg] }),
       });
       const data = await response.json();
-      const assistantMsg = { role: "assistant", content: data.reply || "SYSTEM_OFFLINE" };
+      const assistantMsg = {
+        role: "assistant",
+        content: data.reply || "SYSTEM_OFFLINE",
+      };
       setMessages((prev) => [...prev, assistantMsg]);
       playSfx("receive");
 
@@ -96,11 +104,18 @@ export default function Home() {
         ]);
       } else {
         setHistory((prev) =>
-          prev.map((s) => s.id === activeSessionId ? { ...s, messages: [...messages, userMsg, assistantMsg] } : s)
+          prev.map((s) =>
+            s.id === activeSessionId
+              ? { ...s, messages: [...messages, userMsg, assistantMsg] }
+              : s,
+          ),
         );
       }
     } catch (error) {
-      setMessages((prev) => [...prev, { role: "assistant", content: "[SYSTEM_ERROR]" }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "[SYSTEM_ERROR]" },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -114,9 +129,7 @@ export default function Home() {
 
       <div
         className={`absolute inset-0 z-0 bg-cover bg-center transition-all duration-1000 ${
-          activeMobilePanel !== "chat"
-            ? " brightness-[0.5]"
-            : "opacity-30"
+          activeMobilePanel !== "chat" ? " brightness-[0.5]" : "opacity-30"
         }`}
         style={{
           backgroundImage: "url('/background.png')",
