@@ -1,6 +1,12 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Terminal, Send } from "lucide-react";
+import {
+  Plus,
+  Terminal,
+  Send,
+  Music,
+  History as HistoryIcon,
+} from "lucide-react";
 import { useEffect, useRef } from "react";
 
 export default function ChatPanel({
@@ -10,59 +16,71 @@ export default function ChatPanel({
   handleSend,
   startNewChat,
   isLoading,
+  onToggleLeft,
+  onToggleRight,
 }: any) {
   const scrollRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
   return (
-    <section className="flex-1 flex flex-col cyber-panel neon-border-cyan z-20 overflow-hidden clip-chamfer bg-black/20">
-      <div className="p-4 border-b border-white/10 flex justify-between items-center bg-black/30 backdrop-blur-md">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 border border-cyber-cyan rounded-full p-0.5">
-            <div className="w-full h-full rounded-full bg-zinc-800 overflow-hidden">
+    <section className="flex-1 flex flex-col h-full cyber-panel neon-border-cyan z-20 overflow-hidden md:clip-chamfer bg-black/20">
+      <div className="bg-black/40 p-3 md:p-4 border-b border-white/10 flex justify-between items-center flex-shrink-0">
+        <div className="flex items-center gap-3 ">
+          <button
+            onClick={onToggleLeft}
+            className="xl:hidden p-2 text-cyber-cyan border border-cyber-cyan/30 hover:bg-cyber-cyan/10 transition-all clip-chamfer"
+          >
+            <Music size={18} />
+          </button>
+
+          <div className="flex items-center gap-2 md:gap-3 ">
+            <div className="w-8 h-8 md:w-10 md:h-10 border border-cyber-cyan rounded-full p-0.5 shrink-0">
               <img
                 src="/profile.jpg"
-                className="w-full h-full object-cover opacity-80"
+                className="w-full h-full rounded-full object-cover opacity-80"
                 alt="profile"
               />
             </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-black italic text-sm tracking-tighter text-cyber-cyan">
-              AMADEUS_SYSTEM
-            </span>
-            <span className="text-[8px] text-cyber-cyan/50 tracking-[0.2em]">
-              STATUS: ONLINE
-            </span>
+            <div className="flex flex-col">
+              <span className="font-black italic text-[10px] md:text-sm tracking-tighter text-cyber-cyan uppercase truncate max-w-[120px]  xs:max-w-none">
+                Amadeus_Senpai
+              </span>
+              <div className="flex items-center gap-1">
+                <span className="w-1 h-1 bg-cyber-cyan animate-pulse rounded-full" />
+                <span className="text-[6px] md:text-[8px] text-cyber-cyan/50 tracking-[0.2em]">
+                  ONLINE
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <button
-          onClick={startNewChat}
-          title="New Neural Link"
-          className="p-2 border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan hover:text-black transition-all group"
-        >
-          <Plus
-            size={20}
-            className="group-hover:rotate-90 transition-transform"
-          />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={startNewChat}
+            className="p-2 border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan hover:text-black transition-all clip-chamfer"
+          >
+            <Plus size={20} />
+          </button>
+
+          <button
+            onClick={onToggleRight}
+            className="lg:hidden p-2 text-cyber-magenta border border-cyber-magenta/30 hover:bg-cyber-magenta/10 transition-all clip-chamfer"
+          >
+            <HistoryIcon size={18} />
+          </button>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-cyber">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 scrollbar-cyber">
         {messages.length === 0 && !isLoading && (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center space-y-2 opacity-20">
-              <Terminal className="mx-auto mb-4" size={40} />
-              <p className="text-[10px] uppercase tracking-[0.4em]">
-                Awaiting Input...
-              </p>
-            </div>
+          <div className="h-full flex flex-col items-center justify-center opacity-20">
+            <Terminal size={32} className="mb-2" />
+            <p className="text-[8px] md:text-[10px] uppercase tracking-[0.4em]">
+              Awaiting Link...
+            </p>
           </div>
         )}
 
@@ -75,66 +93,40 @@ export default function ChatPanel({
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`px-6 py-4 max-w-[85%] text-sm font-medium tracking-wide shadow-xl ${
+                className={`px-4 py-3 md:px-6 md:py-4 max-w-[85%] md:max-w-[75%] text-xs md:text-sm font-medium ${
                   msg.role === "user"
-                    ? "bg-cyber-magenta/20 text-white clip-msg-user border-r-2 border-cyber-magenta"
-                    : "bg-cyber-cyan/15 text-white clip-msg-bot border-l-2 border-cyber-cyan"
+                    ? "bg-cyber-magenta/20 text-white clip-msg-user border-r-2 border-cyber-magenta shadow-[0_0_20px_rgba(255,0,255,0.05)]"
+                    : "bg-cyber-cyan/15 text-white clip-msg-bot border-l-2 border-cyber-cyan shadow-[0_0_20px_rgba(0,243,255,0.05)]"
                 }`}
               >
                 {msg.content}
               </div>
             </motion.div>
           ))}
-
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex justify-start"
-            >
-              <div className="bg-cyber-cyan/10 text-cyber-cyan clip-msg-bot border-l-2 border-cyber-cyan px-6 py-4">
-                <div className="flex gap-1.5 items-center h-4">
-                  {[0, 1, 2].map((dot) => (
-                    <motion.div
-                      key={dot}
-                      animate={{ scale: [1, 1.4, 1], opacity: [0.3, 1, 0.3] }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 0.8,
-                        delay: dot * 0.2,
-                      }}
-                      className="w-1.5 h-1.5 bg-cyber-cyan"
-                    />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
-
         <div ref={scrollRef} />
       </div>
 
-      <div className="p-6 bg-black/40 border-t border-white/10 flex gap-3">
-        <div className="flex-1 relative flex items-center bg-white/5 border border-white/10 clip-chamfer px-4">
-          <Terminal className="text-cyber-yellow" size={16} />
+      <div className="p-3 md:p-6 bg-black/60 border-t border-white/10 flex gap-2 md:gap-3 flex-shrink-0">
+        <div className="flex-1 relative flex items-center bg-white/5 border border-white/10 clip-chamfer px-3 md:px-4">
+          <Terminal className="text-cyber-yellow hidden xs:block" size={14} />
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder={
-              isLoading ? "NEURAL_LINK_BUSY..." : "TYPE_MESSAGE_HERE..."
-            }
-            disabled={isLoading}
-            className="w-full p-3 bg-transparent text-white outline-none font-mono text-xs italic disabled:opacity-50"
+            placeholder={isLoading ? "LINKING..." : "TYPE_MSG..."}
+            className="w-full p-2 md:p-3 bg-transparent text-white outline-none font-mono text-[10px] md:text-xs italic"
           />
         </div>
         <button
           onClick={handleSend}
           disabled={isLoading}
-          className="bg-cyber-cyan text-black px-8 font-black uppercase text-[10px] clip-chamfer hover:bg-white transition-all flex items-center gap-2 disabled:bg-zinc-800 disabled:text-zinc-500"
+          className="bg-cyber-cyan text-black px-4 md:px-8 font-black uppercase text-[10px] clip-chamfer flex items-center gap-2 hover:bg-white transition-all shadow-[0_0_15px_rgba(0,243,255,0.2)]"
         >
-          {isLoading ? "WAIT" : "SEND"} <Send size={12} />
+          <span className="hidden xs:inline">
+            {isLoading ? "WAIT" : "SEND"}
+          </span>
+          <Send size={12} />
         </button>
       </div>
     </section>
