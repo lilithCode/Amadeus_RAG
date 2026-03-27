@@ -24,4 +24,9 @@ export const TRACKS = [
     file: "I Really Wanna Stay At Your House.mp3",
     cover: "/covers/stayYourHouse-cover.jpg",
   },
+  {
+    name: "Stay With Me",
+    file: "Stay with me.mp3",
+    cover: "/covers/stay with me.jpg",
+  }
 ];

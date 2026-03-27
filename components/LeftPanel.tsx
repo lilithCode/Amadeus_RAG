@@ -14,6 +14,7 @@ export default function LeftPanel({
 
   useEffect(() => {
     if (!audioRef.current) return;
+     audioRef.current.volume = 0.1;
     audioRef.current.src = `/sfx/Playlist/${TRACKS[currentTrack].file}`;
     if (isPlaying) audioRef.current.play().catch(() => {});
   }, [currentTrack]);
