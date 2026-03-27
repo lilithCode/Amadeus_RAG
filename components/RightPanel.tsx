@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { History, Info, Code, Activity, Github, Database } from "lucide-react";
+import { History, Info, Code, Activity, Github, Database, BookAIcon, SmileIcon } from "lucide-react";
 
 export default function RightPanel({
   playSfx,
@@ -12,16 +12,22 @@ export default function RightPanel({
   isPlaying,
 }: any) {
   const [showLinks, setShowLinks] = useState(false);
+
   const links = [
     {
       name: "GitHub Repo",
       icon: <Github size={14} />,
-      url: "https://github.com/lilithCode/Amadeus",
+      url: "https://github.com/lilithCode/Amadeus_RAG",
     },
     {
       name: "Kaggle Notebook",
       icon: <Database size={14} />,
       url: "https://www.kaggle.com/code/hamnamubarak/amadeus",
+    },
+    {
+      name: "Hugging Face Space",
+    icon: <SmileIcon size={14} />,
+      url: "https://huggingface.co/spaces/lilLilith/Amadeus-RAG/tree/main",
     },
   ];
 
@@ -61,7 +67,11 @@ export default function RightPanel({
             <button
               key={h.id}
               onClick={() => loadSession(h)}
-              className={`w-full text-left text-[10px] font-bold p-3 border-l-2 transition-all italic flex flex-col gap-1 ${activeSessionId === h.id ? "bg-cyber-cyan/10 border-cyber-cyan text-cyber-cyan" : "border-transparent text-white/40 hover:text-white"}`}
+              className={`w-full text-left text-[10px] font-bold p-3 border-l-2 transition-all italic flex flex-col gap-1 ${
+                activeSessionId === h.id
+                  ? "bg-cyber-cyan/10 border-cyber-cyan text-cyber-cyan"
+                  : "border-transparent text-white/40 hover:text-white"
+              }`}
             >
               <span className="truncate uppercase">{`> ${h.name}`}</span>
               <span className="text-[8px] opacity-30 font-mono">{h.date}</span>
@@ -106,6 +116,7 @@ export default function RightPanel({
             </motion.div>
           )}
         </AnimatePresence>
+
         <button
           onClick={() => {
             setShowLinks(!showLinks);
