@@ -9,18 +9,18 @@ import RightPanel from "@/components/RightPanel";
 import AboutModal from "@/components/AboutModal";
 
 export default function Home() {
-  const [bootProgress, setBootProgress] = useState(0);
+  const[bootProgress, setBootProgress] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
   const [showAbout, setShowAbout] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const[isLoading, setIsLoading] = useState(false);
 
   const [activeMobilePanel, setActiveMobilePanel] = useState<
     "chat" | "left" | "right"
   >("chat");
 
-  const [messages, setMessages] = useState<any[]>([]);
+  const[messages, setMessages] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -34,7 +34,7 @@ export default function Home() {
         console.error(e);
       }
     }
-  }, []);
+  },[]);
 
   useEffect(() => {
     if (history.length > 0)
@@ -80,7 +80,7 @@ export default function Home() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, userMsg] }),
+        body: JSON.stringify({ messages:[...messages, userMsg] }),
       });
       const data = await response.json();
       const assistantMsg = {
@@ -93,11 +93,11 @@ export default function Home() {
       if (!activeSessionId) {
         const newId = Date.now().toString();
         setActiveSessionId(newId);
-        setHistory((prev) => [
+        setHistory((prev) =>[
           {
             id: newId,
             name: userText.substring(0, 20),
-            messages: [...messages, userMsg, assistantMsg],
+            messages:[...messages, userMsg, assistantMsg],
             date: new Date().toLocaleTimeString(),
           },
           ...prev,
@@ -127,9 +127,10 @@ export default function Home() {
         <CyberCursor />
       </div>
 
+
       <div
         className={`absolute inset-0 z-0 bg-cover bg-center transition-all duration-1000 ${
-          activeMobilePanel !== "chat" ? " brightness-[0.5]" : "opacity-30"
+          activeMobilePanel !== "chat" ? " brightness-[0.3]" : "opacity-40"
         }`}
         style={{
           backgroundImage: "url('/background.png')",

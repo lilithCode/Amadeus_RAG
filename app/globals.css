@@ -20,15 +20,16 @@
 }
 
 @layer utilities {
-  
-    .clip-chamfer-left {
-      clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
-    }
-  
-     .cyber-panel {
-       background: rgba(0, 0, 0, 0.2);
-       border: 1px solid rgba(0, 243, 255, 0.2);
-     }
+  .clip-chamfer-left {
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .cyber-panel {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+  }
+
   .cyber-glass {
     @apply bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl;
   }
@@ -54,21 +55,21 @@
   }
 
   .clip-msg-bot {
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
   }
 
   .clip-msg-user {
-    clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 15%);
+    clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%, 0 calc(100% - 15px));
   }
 
   .neon-border-cyan {
-    border: 1px solid rgba(0, 243, 255, 0.4);
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+    border: 1px solid rgba(0, 243, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.15), inset 0 0 15px rgba(0, 243, 255, 0.05);
   }
 
   .neon-border-magenta {
-    border: 1px solid rgba(255, 0, 255, 0.4);
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.1);
+    border: 1px solid rgba(255, 0, 255, 0.5);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.15), inset 0 0 15px rgba(255, 0, 255, 0.05);
   }
 
   .animate-spin-slow {
@@ -84,6 +85,8 @@
       transform: rotate(360deg);
     }
   }
+
+
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
