@@ -19,6 +19,9 @@ https://www.kaggle.com/code/hamnamubarak/amadeus/edit
 https://huggingface.co/spaces/lilLilith/Amadeus-RAG/tree/main
 
 ---
+<p align="center">
+  <img src="./public/Readme/cover.jpg" alt="AMADEUS Cover" width="100%">
+</p>
 
 ## Training Pipeline
 
